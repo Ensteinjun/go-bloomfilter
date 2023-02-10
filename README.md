@@ -1,5 +1,5 @@
 # go-bloomfilter
-Bloom filters for go
+bloomfilter for golang
 
 
 ## Example
