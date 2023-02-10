@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Ensteinjun/go-bloomfilter/container"
+	"github.com/ensteinjun/go-bloomfilter/container"
 )
 
 func (c baseBloomFilter) computeHash(hashId int32, value []byte) int64 {

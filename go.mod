@@ -1,3 +1,4 @@
-module github.com/Ensteinjun/go-bloomfilter
+module github.com/ensteinjun/go-bloomfilter
 
-go 1.19
+go 1.18
+

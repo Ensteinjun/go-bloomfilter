@@ -17,7 +17,8 @@ func (c baseBloomFilter) Capacity() int64 {
 }
 
 func (c baseBloomFilter) ComputeStoreSize() int64 {
-	return int64(math.Ceil(float64(c.bloomSize) / 2.0))
+	// unit: bytes
+	return int64(math.Ceil(float64(c.bloomSize) / 8.0))
 }
 
 func (c *baseBloomFilter) Reset() {
