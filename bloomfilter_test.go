@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ensteinjun/go-bloomfilter"
+	"github.com/Ensteinjun/go-bloomfilter"
 )
 
 func TestBloomFilter(t *testing.T) {

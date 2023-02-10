@@ -3,7 +3,7 @@ package bloomfilter
 import (
 	"math"
 
-	"github.com/ensteinjun/go-bloomfilter/container"
+	"github.com/Ensteinjun/go-bloomfilter/container"
 )
 
 type (
