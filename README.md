@@ -4,6 +4,7 @@ bloomfilter for golang
 
 ## Example
 ```golang
+// memorty bloom filter
 bf := bloomfilter.NewMemoryBloomFilter(100000, 0.001, nil)
 bf.Add([]byte("hello"))
 bf.Add([]byte("world"))
@@ -13,6 +14,30 @@ fmt.Printf("Error: %f\n", bf.Error())
 fmt.Printf("Exists[hello]: %v\n", bf.Contains([]byte("hello")))
 fmt.Printf("Exists[world]: %v\n", bf.Contains([]byte("world")))
 fmt.Printf("Exists[golang]: %v\n", bf.Contains([]byte("golang")))
+
+// save bloomfilter to file
+writer, err := os.OpenFile("./test.bf", os.O_WRONLY|os.O_CREATE, 0666)
+if err != nil {
+    log.Fatalf("write failed failed: %v", err)
+}
+bf.Save(writer)
+
+/*
+Load bloomfilter from File
+
+It is necessary to ensure that the two values ​​of hashFunction and container.GetMaxBitSize() cannot be changed, otherwise the bloomfilter of load cannot work correctly
+*/ 
+fmt.Println("Load Bloom Filter")
+bf2, err := bloomfilter.LoadBloomFilter("./test.bf", container.NewMemoryContainer(), nil)
+if err != nil {
+    log.Fatalf("load bloom filter failed: %v", err)
+}
+fmt.Printf("Exists[hello]: %v\n", bf2.Contains([]byte("hello")))
+fmt.Printf("Exists[world]: %v\n", bf2.Contains([]byte("world")))
+fmt.Printf("Exists[golang]: %v\n", bf2.Contains([]byte("golang")))
+fmt.Printf("Capacity: %d\n", bf2.Capacity())
+fmt.Printf("Size: %d\n", bf2.Size())
+fmt.Printf("Error: %f\n", bf2.Error())
 ```
 
 ## Run Test
