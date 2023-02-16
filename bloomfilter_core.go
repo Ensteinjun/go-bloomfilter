@@ -44,15 +44,18 @@ func (c *baseBloomFilter) Add(value []byte) bool {
 	return true
 }
 
-func (c *baseBloomFilter) Contains(value []byte) bool {
+func (c *baseBloomFilter) Contains(value []byte) (bool, error) {
 	for i := int32(0); i < c.hashNum; i++ {
 		v := c.computeHash(i, value)
 
 		containerId := int32(v / c.container.GetMaxBitSize())
 		containerIndex := v % c.container.GetMaxBitSize()
-		if !c.container.GetBit(containerId, containerIndex) {
-			return false
+		exists, err := c.container.GetBit(containerId, containerIndex)
+		if err != nil {
+			return false, err
+		} else if !exists {
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }

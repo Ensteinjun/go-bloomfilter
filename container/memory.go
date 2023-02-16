@@ -1,5 +1,7 @@
 package container
 
+import "math"
+
 type MemoryContainer struct {
 	conainainer map[int32]map[int64]bool
 }
@@ -8,20 +10,24 @@ func NewMemoryContainer() *MemoryContainer {
 	return &MemoryContainer{conainainer: make(map[int32]map[int64]bool)}
 }
 
-func (c MemoryContainer) GetBit(containerId int32, val int64) bool {
+func (c *MemoryContainer) GetBit(containerId int32, val int64) (bool, error) {
 	if _, ok := c.conainainer[containerId]; !ok {
-		return false
+		return false, nil
 	}
 	if _, ok := c.conainainer[containerId][val]; !ok {
-		return false
+		return false, nil
 	}
-	return true
+	return true, nil
 }
 
 func (c *MemoryContainer) SetBit(containerId int32, val int64) SetStatus {
-	if c.GetBit(containerId, val) {
+	exists, err := c.GetBit(containerId, val)
+	if err != nil {
+		return SetBitFailed
+	} else if exists {
 		return SetBitExists
 	}
+
 	if _, ok := c.conainainer[containerId]; !ok {
 		c.conainainer[containerId] = make(map[int64]bool)
 	}
@@ -29,8 +35,8 @@ func (c *MemoryContainer) SetBit(containerId int32, val int64) SetStatus {
 	return SetBitOK
 }
 
-func (c MemoryContainer) GetMaxBitSize() int64 {
-	return 2 ^ 31 - 1
+func (c *MemoryContainer) GetMaxBitSize() int64 {
+	return math.MaxInt32
 }
 
 func (c *MemoryContainer) Reset() bool {
@@ -38,11 +44,11 @@ func (c *MemoryContainer) Reset() bool {
 	return true
 }
 
-func (c *MemoryContainer) Export() map[int32]map[int64]bool {
-	return c.conainainer
+func (c *MemoryContainer) Export() (map[int32]map[int64]bool, error) {
+	return c.conainainer, nil
 }
 
-func (c *MemoryContainer) Import(data map[int32]map[int64]bool) bool {
+func (c *MemoryContainer) Import(data map[int32]map[int64]bool) error {
 	c.conainainer = data
-	return true
+	return nil
 }

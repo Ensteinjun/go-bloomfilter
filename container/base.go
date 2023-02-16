@@ -9,10 +9,10 @@ const (
 )
 
 type BloomFilterContainer interface {
-	GetBit(conainterId int32, index int64) bool
+	GetBit(conainterId int32, index int64) (bool, error)
 	SetBit(conainterId int32, index int64) SetStatus
 	GetMaxBitSize() int64
 	Reset() bool
-	Export() map[int32]map[int64]bool
-	Import(map[int32]map[int64]bool) bool
+	Export() (map[int32]map[int64]bool, error)
+	Import(map[int32]map[int64]bool) error
 }

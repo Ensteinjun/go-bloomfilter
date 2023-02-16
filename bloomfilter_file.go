@@ -11,8 +11,12 @@ import (
 
 const magicNum uint32 = 0x9587001
 
-func (c *baseBloomFilter) Save(writer io.Writer) bool {
-	containers := c.container.Export()
+func (c *baseBloomFilter) Save(writer io.Writer) error {
+	containers, err := c.container.Export()
+	if err != nil {
+		return err
+	}
+
 	containerIds := make([]int32, 0)
 	for cid := range containers {
 		containerIds = append(containerIds, cid)
@@ -47,7 +51,7 @@ func (c *baseBloomFilter) Save(writer io.Writer) bool {
 			writer.Write(buf)
 		}
 	}
-	return true
+	return nil
 }
 
 func (c *baseBloomFilter) Load(reader io.Reader) error {
@@ -108,8 +112,5 @@ func (c *baseBloomFilter) Load(reader io.Reader) error {
 			containers[cid][v] = true
 		}
 	}
-	if !c.container.Import(containers) {
-		return errors.New("import data to container failed")
-	}
-	return nil
+	return c.container.Import(containers)
 }

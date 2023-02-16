@@ -1,6 +1,7 @@
 package bloomfilter
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -36,6 +37,7 @@ func (c *baseBloomFilter) initParameters(capacity int64, errorRate float64) {
 	c.bloomSize = bloomSize
 	c.hashNum = hashNum
 	c.containerNum = containerNum
+	fmt.Printf("ContainerNum: %d\n", c.containerNum)
 }
 
 func (c *baseBloomFilter) Reset() {
