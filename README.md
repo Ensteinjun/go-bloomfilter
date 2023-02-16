@@ -1,4 +1,6 @@
 # go-bloomfilter
+[![GoDoc](https://godoc.org/github.com/Ensteinjun/go-bloomfilter?utm_source=godoc)](https://godoc.org/github.com/Ensteinjun/go-bloomfilter)
+
 bloomfilter for golang
 
 ## Containers
