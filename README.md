@@ -1,11 +1,31 @@
 # go-bloomfilter
 bloomfilter for golang
 
+## Containers
+```golang
+// Implement this interface and make a custom container
+bloomfilter.BFContainer
+
+// Support
+bloomfilter.NewMemoryBloomFilter
+bloomfilter.NewRedisContainer
+bloomfilter.NewRedisClusterContainer
+```
+
 
 ## Example
 ```golang
-// memorty bloom filter
-bf := bloomfilter.NewMemoryBloomFilter(100000, 0.001, nil)
+// option 1: memorty bloom filter
+bf := bloomfilter.NewMemoryBloomFilter(100000, 0.001)
+
+// option 2: redis bloom filter
+rdc := container.NewRedisContainer(&redis.Options{}, "bf_demo", 2)
+bf := bloomfilter.NewBloomFilter(100000, 0.001, rdc)
+
+// option 3: redis bloom filter
+rdc1 := container.NewRedisClusterContainer(&redis.ClusterOptions{}, "bf_demo", 2)
+bf := bloomfilter.NewBloomFilter(100000, 0.001, rdc1)
+
 bf.Add([]byte("hello"))
 bf.Add([]byte("world"))
 fmt.Printf("Capacity: %d\n", bf.Capacity())

@@ -4,6 +4,7 @@ import "math"
 
 type MemoryContainer struct {
 	conainainer map[int32]map[int64]bool
+	size        int64
 }
 
 func NewMemoryContainer() *MemoryContainer {
@@ -51,4 +52,16 @@ func (c *MemoryContainer) Export() (map[int32]map[int64]bool, error) {
 func (c *MemoryContainer) Import(data map[int32]map[int64]bool) error {
 	c.conainainer = data
 	return nil
+}
+
+func (c *MemoryContainer) IncreaseSize() {
+	c.size++
+}
+
+func (c *MemoryContainer) GetSize() int64 {
+	return c.size
+}
+
+func (c *MemoryContainer) SetSize(size int64) {
+	c.size = size
 }

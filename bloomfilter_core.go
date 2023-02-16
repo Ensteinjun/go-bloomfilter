@@ -20,7 +20,7 @@ func (c *baseBloomFilter) computeHash(hashId int32, value []byte) int64 {
 }
 
 func (c *baseBloomFilter) Add(value []byte) bool {
-	if c.keySize >= c.capacity {
+	if c.container.GetSize() >= c.capacity {
 		return false
 	}
 
@@ -39,7 +39,7 @@ func (c *baseBloomFilter) Add(value []byte) bool {
 
 	}
 	if !exists {
-		c.keySize++ // add new key
+		c.container.IncreaseSize()
 	}
 	return true
 }

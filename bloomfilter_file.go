@@ -29,7 +29,7 @@ func (c *baseBloomFilter) Save(writer io.Writer) error {
 	writer.Write(buf)
 	binary.LittleEndian.PutUint64(buf, math.Float64bits(c.errorRate))
 	writer.Write(buf)
-	binary.LittleEndian.PutUint64(buf, uint64(c.keySize))
+	binary.LittleEndian.PutUint64(buf, uint64(c.Size()))
 	writer.Write(buf)
 	binary.LittleEndian.PutUint32(buf[:4], uint32(len(containerIds)))
 	writer.Write(buf[:4])
@@ -81,7 +81,7 @@ func (c *baseBloomFilter) Load(reader io.Reader) error {
 	if err != nil || n != 8 {
 		return fmt.Errorf("unknown format, can't read file[n=%d]: %v", n, err)
 	}
-	c.keySize = int64(binary.LittleEndian.Uint64(buf))
+	c.container.SetSize(int64(binary.LittleEndian.Uint64(buf)))
 
 	n, err = reader.Read(buf[:4])
 	if err != nil || n != 4 {

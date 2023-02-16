@@ -8,11 +8,16 @@ const (
 	SetBitExists SetStatus = 2
 )
 
-type BloomFilterContainer interface {
-	GetBit(conainterId int32, index int64) (bool, error)
-	SetBit(conainterId int32, index int64) SetStatus
-	GetMaxBitSize() int64
-	Reset() bool
+type BFContainer interface {
 	Export() (map[int32]map[int64]bool, error)
 	Import(map[int32]map[int64]bool) error
+	GetBit(conainterId int32, index int64) (bool, error)
+	SetBit(conainterId int32, index int64) SetStatus
+
+	GetSize() int64
+	SetSize(int64)
+	IncreaseSize()
+
+	Reset() bool
+	GetMaxBitSize() int64
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func TestBloomFilter(t *testing.T) {
-	bf := bloomfilter.NewMemoryBloomFilter(100000, 0.001, nil)
+	bf := bloomfilter.NewMemoryBloomFilter(100000, 0.001)
 	bf.Add([]byte("hello"))
 	bf.Add([]byte("world"))
 
@@ -35,7 +35,7 @@ func TestBloomFilter(t *testing.T) {
 	bf.Save(writer)
 
 	fmt.Println("\nLoad Bloom Filter")
-	bf2, err := bloomfilter.LoadBloomFilter("./test.bf", container.NewMemoryContainer(), nil)
+	bf2, err := bloomfilter.LoadBloomFilter("./test.bf", container.NewMemoryContainer())
 	if err != nil {
 		log.Fatalf("load bloom filter failed: %v", err)
 	}
@@ -53,7 +53,7 @@ func TestBloomFilter(t *testing.T) {
 
 func TestRedisBloomFilter(t *testing.T) {
 	rdc := container.NewRedisContainer(&redis.Options{}, "bf_demo5", 2)
-	bf := bloomfilter.NewBloomFilter(100000, 0.001, rdc, nil)
+	bf := bloomfilter.NewBloomFilter(100000, 0.001, rdc)
 	bf.Add([]byte("hello"))
 	bf.Add([]byte("world"))
 
@@ -74,7 +74,7 @@ func TestRedisBloomFilter(t *testing.T) {
 	bf.Save(writer)
 
 	fmt.Println("\nLoad Bloom Filter")
-	bf2, err := bloomfilter.LoadBloomFilter("./test.bf", container.NewRedisContainer(&redis.Options{}, "bf_demo2", 2), nil)
+	bf2, err := bloomfilter.LoadBloomFilter("./test.bf", container.NewRedisContainer(&redis.Options{}, "bf_demo2", 2))
 	if err != nil {
 		log.Fatalf("load bloom filter failed: %v", err)
 	}

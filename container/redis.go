@@ -14,6 +14,7 @@ type RedisContainer struct {
 	containerIdMap map[int32]int32
 	keyPrefix      string
 	maxKeyNum      int32
+	size           int64
 }
 
 func NewRedisContainer(opt *redis.Options, keyPrefix string, maxKeyNum int32) *RedisContainer {
@@ -64,17 +65,6 @@ func (c *RedisContainer) SetBit(containerId int32, val int64) SetStatus {
 	}
 }
 
-func (c *RedisContainer) GetMaxBitSize() int64 {
-	return 2 ^ 20 // 128 KB
-}
-
-func (c *RedisContainer) Reset() bool {
-	for cid := range c.containerIdMap {
-		c.rdb.Del(context.Background(), c.getKey(cid)).Result()
-	}
-	return true
-}
-
 func (c *RedisContainer) Export() (map[int32]map[int64]bool, error) {
 	data := make(map[int32]map[int64]bool)
 	for cid := range c.containerIdMap {
@@ -109,4 +99,28 @@ func (c *RedisContainer) Import(data map[int32]map[int64]bool) error {
 		}
 	}
 	return nil
+}
+
+func (c *RedisContainer) Reset() bool {
+	for cid := range c.containerIdMap {
+		c.rdb.Del(context.Background(), c.getKey(cid)).Result()
+	}
+	c.size = 0
+	return true
+}
+
+func (c *RedisContainer) GetMaxBitSize() int64 {
+	return 2 ^ 20 // 128 KB
+}
+
+func (c *RedisContainer) IncreaseSize() {
+	c.size++
+}
+
+func (c *RedisContainer) GetSize() int64 {
+	return c.size
+}
+
+func (c *RedisContainer) SetSize(size int64) {
+	c.size = size
 }

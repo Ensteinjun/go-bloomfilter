@@ -10,7 +10,7 @@ func (c *baseBloomFilter) Error() float64 {
 }
 
 func (c *baseBloomFilter) Size() int64 {
-	return c.keySize
+	return c.container.GetSize()
 }
 
 func (c *baseBloomFilter) Capacity() int64 {
@@ -41,6 +41,5 @@ func (c *baseBloomFilter) initParameters(capacity int64, errorRate float64) {
 }
 
 func (c *baseBloomFilter) Reset() {
-	c.keySize = 0
 	c.container.Reset()
 }
