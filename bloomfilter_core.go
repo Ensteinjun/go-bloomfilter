@@ -8,7 +8,7 @@ import (
 	"github.com/Ensteinjun/go-bloomfilter/container"
 )
 
-func (c baseBloomFilter) computeHash(hashId int32, value []byte) int64 {
+func (c *baseBloomFilter) computeHash(hashId int32, value []byte) int64 {
 	var ret int64
 	if c.hashFunc != nil {
 		ret = c.hashFunc(hashId, value)
@@ -44,7 +44,7 @@ func (c *baseBloomFilter) Add(value []byte) bool {
 	return true
 }
 
-func (c baseBloomFilter) Contains(value []byte) bool {
+func (c *baseBloomFilter) Contains(value []byte) bool {
 	for i := int32(0); i < c.hashNum; i++ {
 		v := c.computeHash(i, value)
 

@@ -1,7 +1,7 @@
 package bloomfilter
 
 import (
-	"math"
+	"os"
 
 	"github.com/Ensteinjun/go-bloomfilter/container"
 )
@@ -23,22 +23,24 @@ type (
 )
 
 func NewBloomFilter(capacity int64, errorRate float64, container container.BloomFilterContainer, hashFunc HashFunction) *baseBloomFilter {
-	var (
-		n int64   = capacity
-		k float64 = -math.Log2(errorRate)
-		m float64 = float64(n) * k / math.Log(2)
-
-		hashNum      = int32(math.Ceil(k))
-		bloomSize    = int32(math.Ceil(m))
-		containerNum = int32(math.Ceil(float64(bloomSize) / float64(container.GetMaxBitSize())))
-	)
-
-	return &baseBloomFilter{
-		capacity: capacity, errorRate: errorRate, container: container, keySize: 0,
-		bloomSize: bloomSize, hashNum: hashNum, containerNum: containerNum, hashFunc: hashFunc,
-	}
+	var bf = &baseBloomFilter{container: container, keySize: 0, hashFunc: hashFunc}
+	bf.initParameters(capacity, errorRate)
+	return bf
 }
 
 func NewMemoryBloomFilter(capacity int64, errorRate float64, hashFunc HashFunction) *baseBloomFilter {
 	return NewBloomFilter(capacity, errorRate, container.NewMemoryContainer(), hashFunc)
+}
+
+func LoadBloomFilter(filename string, container container.BloomFilterContainer, hashFunc HashFunction) (*baseBloomFilter, error) {
+	var bf = &baseBloomFilter{container: container, hashFunc: hashFunc}
+	reader, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	err = bf.Load(reader)
+	if err != nil {
+		return nil, err
+	}
+	return bf, nil
 }
