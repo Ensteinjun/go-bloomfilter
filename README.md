@@ -1,5 +1,5 @@
 # go-bloomfilter
-[![GoDoc](https://godoc.org/github.com/Ensteinjun/go-bloomfilter?status.png)](https://godoc.org/github.com/Ensteinjun/go-bloomfilter)
+[![Go Reference](https://pkg.go.dev/badge/github.com/Ensteinjun/go-bloomfilter.svg)](https://pkg.go.dev/github.com/Ensteinjun/go-bloomfilter)
 
 bloomfilter for golang
 
