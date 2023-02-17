@@ -4,26 +4,28 @@ import (
 	"os"
 
 	"github.com/Ensteinjun/go-bloomfilter/container"
+	"github.com/Ensteinjun/go-bloomfilter/hash"
 )
 
+var DefaultHash = hash.BFSipHash
+
 type (
-	HashFunction func(hashId int32, value []byte) int64
-	BFOption     func(*baseBloomFilter)
+	Option func(*baseBloomFilter)
 
 	baseBloomFilter struct {
-		hashFunc HashFunction
+		capacity  int64
+		errorRate float64
+		hashNum   int32
+		bloomSize int32
 
-		capacity     int64
-		errorRate    float64
-		hashNum      int32
-		bloomSize    int32
 		containerNum int32
 		container    container.BFContainer
+		computeHash  hash.BFHash
 	}
 )
 
-func NewBloomFilter(capacity int64, errorRate float64, container container.BFContainer, opts ...BFOption) *baseBloomFilter {
-	var bf = &baseBloomFilter{container: container}
+func NewBloomFilter(capacity int64, errorRate float64, container container.BFContainer, opts ...Option) *baseBloomFilter {
+	var bf = &baseBloomFilter{container: container, computeHash: DefaultHash}
 	bf.initParameters(capacity, errorRate)
 	for _, opt := range opts {
 		opt(bf)
@@ -31,15 +33,16 @@ func NewBloomFilter(capacity int64, errorRate float64, container container.BFCon
 	return bf
 }
 
-func NewMemoryBloomFilter(capacity int64, errorRate float64, opts ...BFOption) *baseBloomFilter {
+func NewMemoryBloomFilter(capacity int64, errorRate float64, opts ...Option) *baseBloomFilter {
 	return NewBloomFilter(capacity, errorRate, container.NewMemoryContainer(), opts...)
 }
 
-func LoadBloomFilter(filename string, container container.BFContainer, opts ...BFOption) (*baseBloomFilter, error) {
-	var bf = &baseBloomFilter{container: container}
+func LoadBloomFilter(filename string, container container.BFContainer, opts ...Option) (*baseBloomFilter, error) {
+	var bf = &baseBloomFilter{container: container, computeHash: DefaultHash}
 	for _, opt := range opts {
 		opt(bf)
 	}
+
 	reader, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -51,8 +54,8 @@ func LoadBloomFilter(filename string, container container.BFContainer, opts ...B
 	return bf, nil
 }
 
-func WithHashFunction(hashFunc HashFunction) BFOption {
+func WithHashFunction(hashFunc hash.BFHash) Option {
 	return func(bbf *baseBloomFilter) {
-		bbf.hashFunc = hashFunc
+		bbf.computeHash = hashFunc
 	}
 }

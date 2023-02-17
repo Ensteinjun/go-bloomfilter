@@ -19,6 +19,7 @@ func TestBloomFilter(t *testing.T) {
 	fmt.Printf("Capacity: %d\n", bf.Capacity())
 	fmt.Printf("Size: %d\n", bf.Size())
 	fmt.Printf("Error: %f\n", bf.Error())
+	fmt.Printf("ComputeStoreSize: %d Bytes\n", bf.ComputeStoreSize())
 
 	exists, err := bf.Contains([]byte("hello"))
 	fmt.Printf("Exists[hello]: %v, Err: %v\n", exists, err)
@@ -60,6 +61,8 @@ func TestRedisBloomFilter(t *testing.T) {
 	fmt.Printf("Capacity: %d\n", bf.Capacity())
 	fmt.Printf("Size: %d\n", bf.Size())
 	fmt.Printf("Error: %f\n", bf.Error())
+	fmt.Printf("ComputeStoreSize: %d Bytes\n", bf.ComputeStoreSize())
+
 	exists, err := bf.Contains([]byte("hello"))
 	fmt.Printf("Exists[hello]: %v, Err: %v\n", exists, err)
 	exists, err = bf.Contains([]byte("world"))

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"sync"
+	"sync/atomic"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -15,6 +17,7 @@ type RedisContainer struct {
 	keyPrefix      string
 	maxKeyNum      int32
 	size           int64
+	mutex          sync.Mutex
 }
 
 func NewRedisContainer(opt *redis.Options, keyPrefix string, maxKeyNum int32) *RedisContainer {
@@ -35,7 +38,9 @@ func NewRedisClusterContainer(opt *redis.ClusterOptions, keyPrefix string, maxKe
 
 func (c *RedisContainer) getKey(containerId int32) string {
 	if _, ok := c.containerIdMap[containerId]; !ok {
+		c.mutex.Lock()
 		c.containerIdMap[containerId] = containerId % c.maxKeyNum
+		c.mutex.Unlock()
 		// metaKey := fmt.Sprintf("%s:meta", c.keyPrefix)
 		// c.rdb.HSet(context.Background(), metaKey, containerId, c.containerIdMap[containerId])
 	}
@@ -66,6 +71,8 @@ func (c *RedisContainer) SetBit(containerId int32, val int64) SetStatus {
 }
 
 func (c *RedisContainer) Export() (map[int32]map[int64]bool, error) {
+	defer c.mutex.Unlock()
+	c.mutex.Lock()
 	data := make(map[int32]map[int64]bool)
 	for cid := range c.containerIdMap {
 		val, err := c.rdb.Get(context.Background(), c.getKey(cid)).Result()
@@ -81,6 +88,8 @@ func (c *RedisContainer) Export() (map[int32]map[int64]bool, error) {
 }
 
 func (c *RedisContainer) Import(data map[int32]map[int64]bool) error {
+	defer c.mutex.Unlock()
+	c.mutex.Lock()
 	for cid, containerData := range data {
 		values := make([]int64, 0)
 		for v := range containerData {
@@ -105,7 +114,7 @@ func (c *RedisContainer) Reset() bool {
 	for cid := range c.containerIdMap {
 		c.rdb.Del(context.Background(), c.getKey(cid)).Result()
 	}
-	c.size = 0
+	atomic.SwapInt64(&c.size, 0)
 	return true
 }
 
@@ -114,7 +123,7 @@ func (c *RedisContainer) GetMaxBitSize() int64 {
 }
 
 func (c *RedisContainer) IncreaseSize() {
-	c.size++
+	atomic.SwapInt64(&c.size, c.size+1)
 }
 
 func (c *RedisContainer) GetSize() int64 {
@@ -122,5 +131,5 @@ func (c *RedisContainer) GetSize() int64 {
 }
 
 func (c *RedisContainer) SetSize(size int64) {
-	c.size = size
+	atomic.SwapInt64(&c.size, size)
 }

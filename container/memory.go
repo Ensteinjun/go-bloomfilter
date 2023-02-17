@@ -1,10 +1,15 @@
 package container
 
-import "math"
+import (
+	"math"
+	"sync"
+	"sync/atomic"
+)
 
 type MemoryContainer struct {
 	conainainer map[int32]map[int64]bool
 	size        int64
+	mutex       sync.Mutex
 }
 
 func NewMemoryContainer() *MemoryContainer {
@@ -30,9 +35,15 @@ func (c *MemoryContainer) SetBit(containerId int32, val int64) SetStatus {
 	}
 
 	if _, ok := c.conainainer[containerId]; !ok {
+		c.mutex.Lock()
 		c.conainainer[containerId] = make(map[int64]bool)
+		c.mutex.Unlock()
 	}
+
+	c.mutex.Lock()
 	c.conainainer[containerId][val] = true
+	c.mutex.Unlock()
+
 	return SetBitOK
 }
 
@@ -41,7 +52,10 @@ func (c *MemoryContainer) GetMaxBitSize() int64 {
 }
 
 func (c *MemoryContainer) Reset() bool {
+	c.mutex.Lock()
 	c.conainainer = make(map[int32]map[int64]bool)
+	c.size = 0
+	c.mutex.Unlock()
 	return true
 }
 
@@ -50,12 +64,14 @@ func (c *MemoryContainer) Export() (map[int32]map[int64]bool, error) {
 }
 
 func (c *MemoryContainer) Import(data map[int32]map[int64]bool) error {
+	c.mutex.Lock()
 	c.conainainer = data
+	c.mutex.Unlock()
 	return nil
 }
 
 func (c *MemoryContainer) IncreaseSize() {
-	c.size++
+	atomic.SwapInt64(&c.size, c.size+1)
 }
 
 func (c *MemoryContainer) GetSize() int64 {
@@ -63,5 +79,5 @@ func (c *MemoryContainer) GetSize() int64 {
 }
 
 func (c *MemoryContainer) SetSize(size int64) {
-	c.size = size
+	atomic.SwapInt64(&c.size, size)
 }
